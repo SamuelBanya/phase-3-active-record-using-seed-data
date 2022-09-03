@@ -1,0 +1,176 @@
+Here are the commands I used:
+#+begin_src bash
+bundle install
+
+bundle exec rake db:migrate
+#+end_src
+
+Related output of second command:
+#+begin_src bash
+samuelbanya@Samuels-MBP ~/hub/Development/code/phase-3/phase-3-active-record-using-seed-data $ bundle exec rake db:migrate
+== 20210718134231 CreateGames: migrating ======================================
+-- create_table(:games)
+   -> 0.0016s
+== 20210718134231 CreateGames: migrated (0.0016s) =============================
+#+end_src
+
+You can manually create data in a database table with Active Record via this command:
+#+begin_src bash
+Game.create(title: "Breath of the Wild", platform: "Switch", genre: "Action-adventure", price: 60)
+#+end_src
+
+I then added the following to the 'db/seeds.rb' file:
+#+begin_src ruby
+# db/seeds.rb
+Game.create(title: "Breath of the Wild", platform: "Switch", genre: "Action-adventure", price: 60)
+Game.create(title: "Final Fantasy VII", platform: "Playstation", genre: "RPG", price: 60)
+Game.create(title: "Mario Kart", platform: "Switch", genre: "Racing", price: 60)
+#+end_src
+
+I then ran the following 'bundle exec rake db:seed' command so that I could seed the database with the values present in 'db/seeds.rb':
+#+begin_src bash
+samuelbanya@Samuels-MBP ~/hub/Development/code/phase-3/phase-3-active-record-using-seed-data $ bundle exec rake db:seed
+#+end_src
+
+I then checked if the database was successfully seeded with the '.count()' and '.last()' commands after using 'bundle exec rake console':
+#+begin_src bash
+bundle exec rake console
+
+[1] pry(main)> Game.count()
+D, [2022-09-02T20:14:40.831634 #4777] DEBUG -- :    (1.7ms)  SELECT sqlite_version(*)
+D, [2022-09-02T20:14:40.835900 #4777] DEBUG -- :    (0.1ms)  SELECT COUNT(*) FROM "games"
+=> 3
+
+[2] pry(main)> Game.last()
+D, [2022-09-02T20:14:52.219984 #4777] DEBUG -- :   Game Load (0.1ms)  SELECT "games".* FROM "games" ORDER BY "games"."id" DESC LIMIT ?  [["LIMIT", 1]]
+=> #<Game:0x00007fe464b978a0
+ id: 3,
+ title: "Mario Kart",
+ genre: "Racing",
+ platform: "Switch",
+ price: 60,
+ created_at: 2022-09-03 00:13:37.923576 UTC,
+ updated_at: 2022-09-03 00:13:37.923576 UTC>
+#+end_src
+
+I then updated 'db/seeds.rb' accordingly with another game:
+#+begin_src ruby
+# db/seeds.rb
+Game.create(title: "Breath of the Wild", platform: "Switch", genre: "Action-adventure", price: 60)
+Game.create(title: "Final Fantasy VII", platform: "Playstation", genre: "RPG", price: 60)
+Game.create(title: "Mario Kart", platform: "Switch", genre: "Racing", price: 60)
+Game.create(title: "Candy Crush Saga", platform: "Mobile", genre: "Puzzle", price: 0)
+#+end_src
+
+I then re-ran the 'db:seed' command again:
+#+begin_src bash
+samuelbanya@Samuels-MBP ~/hub/Development/code/phase-3/phase-3-active-record-using-seed-data $ bundle exec rake db:seed
+#+end_src
+
+I then checked the results with '.count()' and '.last()' methods after using 'bundle exec rake console', and discovered there were over SEVEN games added:
+#+begin_src ruby
+samuelbanya@Samuels-MBP ~/hub/Development/code/phase-3/phase-3-active-record-using-seed-data $ bundle exec rake console
+[1] pry(main)> Game.count()
+D, [2022-09-02T20:17:14.324789 #4887] DEBUG -- :    (1.6ms)  SELECT sqlite_version(*)
+D, [2022-09-02T20:17:14.329106 #4887] DEBUG -- :    (0.1ms)  SELECT COUNT(*) FROM "games"
+=> 7
+[2] pry(main)> Game.last()
+
+D, [2022-09-02T20:17:18.434208 #4887] DEBUG -- :   Game Load (0.1ms)  SELECT "games".* FROM "games" ORDER BY "games"."id" DESC LIMIT ?  [["LIMIT", 1]]
+=> #<Game:0x00007f7ec2253dc8
+ id: 7,
+ title: "Candy Crush Saga",
+ genre: "Puzzle",
+ platform: "Mobile",
+ price: 0,
+ created_at: 2022-09-03 00:16:40.205774 UTC,
+ updated_at: 2022-09-03 00:16:40.205774 UTC>
+#+end_src
+
+To prevent the multiple duplication issues, I used the 'bundle exec rake db:seed:replant' command:
+#+begin_src bash
+samuelbanya@Samuels-MBP ~/hub/Development/code/phase-3/phase-3-active-record-using-seed-data $ bundle exec rake db:seed:replant
+#+end_src
+
+I then checked the count again:
+#+begin_src ruby
+samuelbanya@Samuels-MBP ~/hub/Development/code/phase-3/phase-3-active-record-using-seed-data $ bundle exec rake console
+
+[1] pry(main)> Game.count()
+D, [2022-09-02T20:19:01.861179 #4925] DEBUG -- :    (1.6ms)  SELECT sqlite_version(*)
+D, [2022-09-02T20:19:01.865461 #4925] DEBUG -- :    (0.1ms)  SELECT COUNT(*) FROM "games"
+=> 4
+#+end_src
+
+I then used the following 'Faker' commands while using 'bundle exec rake console' to test them out:
+#+begin_src bash
+samuelbanya@Samuels-MBP ~/hub/Development/code/phase-3/phase-3-active-record-using-seed-data $ bundle exec rake console
+
+[1] pry(main)> Faker::Name.name
+=> "Merle Wilderman"
+[2] pry(main)> Faker::Name.name
+=> "Zachery Murphy"
+[3] pry(main)> Faker::Name.name
+=> "Miss Madalene Reichert"
+
+[4] pry(main)> Faker::Internet.email
+=> "sherie@rice.org"
+[5] pry(main)> Faker::Food.ingredient
+=> "Morwong"
+[6] pry(main)> Faker::Kpop.girl_groups
+=> "April"
+#+end_src
+
+I then replaced the contents of 'seeds.rb' with the following:
+#+begin_src ruby
+# db/seeds.rb
+# NOTE: This is what I had previously BEFORE I used 'Faker' to generate fake data:
+# Game.create(title: "Breath of the Wild", platform: "Switch", genre: "Action-adventure", price: 60)
+# Game.create(title: "Final Fantasy VII", platform: "Playstation", genre: "RPG", price: 60)
+# Game.create(title: "Mario Kart", platform: "Switch", genre: "Racing", price: 60)
+# Game.create(title: "Candy Crush Saga", platform: "Mobile", genre: "Puzzle", price: 0)
+
+# Adding 'Faker' data:
+puts "Seeding games..."
+
+50.times do
+  Game.create(
+    title: Faker::Game.title,
+    genre: Faker::Game.genre,
+    platform: Faker::Game.platform,
+    price: rand(0..60) # Random number between 0 and 60
+  )
+end
+
+puts "Done seeding!"
+#+end_src
+
+I then ran the 'bundle exec rake db:seed:replant' command to re-seed the database:
+#+begin_src bash
+samuelbanya@Samuels-MBP ~/hub/Development/code/phase-3/phase-3-active-record-using-seed-data $ bundle exec rake db:seed:replant
+Seeding games...
+Done seeding!
+#+end_src
+
+I then checked the .count() and .last() method values for the 'Game' class after using 'bundle exec rake console' accordingly:
+#+begin_src bash
+samuelbanya@Samuels-MBP ~/hub/Development/code/phase-3/phase-3-active-record-using-seed-data $ bundle exec rake console
+
+[1] pry(main)> Game.count()
+
+D, [2022-09-02T20:24:25.866040 #5062] DEBUG -- :    (1.6ms)  SELECT sqlite_version(*)
+D, [2022-09-02T20:24:25.869768 #5062] DEBUG -- :    (0.1ms)  SELECT COUNT(*) FROM "games"
+=> 50
+
+[2] pry(main)> Game.last()
+
+D, [2022-09-02T20:24:28.105675 #5062] DEBUG -- :   Game Load (0.1ms)  SELECT "games".* FROM "games" ORDER BY "games"."id" DESC LIMIT ?  [["LIMIT", 1]]
+=> #<Game:0x00007fdfee33b758
+ id: 61,
+ title: "F-Zero",
+ genre: "Action role-playing",
+ platform: "Sega Master System",
+ price: 37,
+ created_at: 2022-09-03 00:24:05.9654 UTC,
+ updated_at: 2022-09-03 00:24:05.9654 UTC>
+#+end_src
